@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To-Do List App</title>
+ <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="todo-container">
+    <h2>📝 To-Do List</h2>
+    <input type="text" id="taskInput" placeholder="Add new task">
+    <button onclick="addTask()">Add</button>
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    const taskInput = document.getElementById("taskInput");
+    const taskList = document.getElementById("taskList");
+
+   
+    window.onload = function() {
+      const savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+      savedTasks.forEach(task => renderTask(task.text, task.completed));
+    };
+
+    function addTask() {
+      const text = taskInput.value.trim();
+      if (text === "") return alert("Enter a task!");
+
+      renderTask(text, false);
+      saveTasks();
+      taskInput.value = "";
+    }
+
+    function renderTask(text, completed) {
+      const li = document.createElement("li");
+      li.textContent = text;
+      if (completed) li.classList.add("completed");
+
+      li.addEventListener("click", () => {
+        li.classList.toggle("completed");
+        saveTasks();
+      });
+
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "X";
+      delBtn.className = "delete";
+      delBtn.onclick = () => {
+        li.remove();
+        saveTasks();
+      };
+
+      li.appendChild(delBtn);
+      taskList.appendChild(li);
+    }
+
+    function saveTasks() {
+      const tasks = [];
+      document.querySelectorAll("li").forEach(li => {
+        tasks.push({
+          text: li.firstChild.textContent,
+          completed: li.classList.contains("completed")
+        });
+      });
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+  </script>
+</body>
+</html>
